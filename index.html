@@ -1,0 +1,1800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aeroscale — Patient Growth System for Healthcare Clinics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue: #0B5ED7;
+    --blue-dark: #0847b0;
+    --blue-light: #e8f0fd;
+    --teal: #20C997;
+    --teal-dark: #17a37a;
+    --teal-light: #e6f9f4;
+    --white: #ffffff;
+    --grey-50: #f8fafc;
+    --grey-100: #f1f5f9;
+    --grey-200: #e2e8f0;
+    --grey-400: #94a3b8;
+    --grey-600: #475569;
+    --grey-700: #334155;
+    --grey-900: #0f172a;
+    --radius: 16px;
+    --radius-sm: 10px;
+    --shadow-sm: 0 2px 8px rgba(11,94,215,0.08);
+    --shadow-md: 0 8px 32px rgba(11,94,215,0.12);
+    --shadow-lg: 0 20px 60px rgba(11,94,215,0.15);
+    --grad: linear-gradient(135deg, var(--blue) 0%, var(--teal) 100%);
+    --grad-soft: linear-gradient(135deg, #e8f0fd 0%, #e6f9f4 100%);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--white);
+    color: var(--grey-700);
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, h5 {
+    font-family: 'Manrope', sans-serif;
+    color: var(--grey-900);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  a { text-decoration: none; color: inherit; }
+
+  img { max-width: 100%; }
+
+  /* Animations */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.7s cubic-bezier(0.22,1,0.36,1), transform 0.7s cubic-bezier(0.22,1,0.36,1);
+  }
+  .fade-up.visible { opacity: 1; transform: translateY(0); }
+  .fade-up.d1 { transition-delay: 0.1s; }
+  .fade-up.d2 { transition-delay: 0.2s; }
+  .fade-up.d3 { transition-delay: 0.3s; }
+  .fade-up.d4 { transition-delay: 0.4s; }
+  .fade-up.d5 { transition-delay: 0.5s; }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 14px 28px;
+    border-radius: 50px;
+    font-family: 'Manrope', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.25s cubic-bezier(0.22,1,0.36,1);
+    white-space: nowrap;
+    letter-spacing: -0.01em;
+  }
+  .btn:hover { transform: scale(1.03); }
+  .btn:active { transform: scale(0.97); }
+
+  .btn-primary {
+    background: var(--grad);
+    color: white;
+    box-shadow: 0 4px 20px rgba(11,94,215,0.35);
+  }
+  .btn-primary:hover { box-shadow: 0 8px 32px rgba(11,94,215,0.45); }
+
+  .btn-secondary {
+    background: white;
+    color: var(--blue);
+    border: 2px solid var(--blue-light);
+    box-shadow: var(--shadow-sm);
+  }
+  .btn-secondary:hover { border-color: var(--blue); background: var(--blue-light); }
+
+  .btn-outline-white {
+    background: transparent;
+    color: white;
+    border: 2px solid rgba(255,255,255,0.5);
+  }
+  .btn-outline-white:hover { background: rgba(255,255,255,0.15); border-color: white; }
+
+  .btn-lg { padding: 18px 36px; font-size: 16px; }
+  .btn-sm { padding: 10px 20px; font-size: 13px; }
+
+  /* Layout */
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+  .section { padding: 96px 0; }
+  .section-sm { padding: 64px 0; }
+
+  .section-label {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--grad-soft);
+    color: var(--blue);
+    font-family: 'Manrope', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    border-radius: 50px;
+    border: 1px solid var(--blue-light);
+    margin-bottom: 20px;
+  }
+
+  .section-title {
+    font-size: clamp(28px, 4vw, 44px);
+    font-weight: 800;
+    margin-bottom: 16px;
+  }
+
+  .section-sub {
+    font-size: 17px;
+    color: var(--grey-600);
+    max-width: 560px;
+    line-height: 1.7;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--grey-200);
+    transition: box-shadow 0.3s;
+  }
+  nav.scrolled { box-shadow: 0 4px 24px rgba(11,94,215,0.08); }
+  .nav-inner {
+    max-width: 1100px; margin: 0 auto; padding: 0 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 68px;
+  }
+  .logo {
+    font-family: 'Manrope', sans-serif;
+    font-weight: 900; font-size: 22px;
+    letter-spacing: -0.03em;
+    background: var(--grad);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .logo span { -webkit-text-fill-color: var(--teal); }
+  .nav-links { display: flex; align-items: center; gap: 32px; }
+  .nav-links a { font-size: 14px; font-weight: 500; color: var(--grey-600); transition: color 0.2s; }
+  .nav-links a:hover { color: var(--blue); }
+  .nav-cta { display: flex; align-items: center; gap: 12px; }
+  .hamburger { display: none; cursor: pointer; flex-direction: column; gap: 5px; }
+  .hamburger span { display: block; width: 24px; height: 2px; background: var(--grey-700); border-radius: 2px; transition: all 0.3s; }
+
+  /* HERO */
+  .hero {
+    padding: 140px 0 80px;
+    background: var(--white);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; top: -100px; right: -200px;
+    width: 700px; height: 700px;
+    background: radial-gradient(ellipse, rgba(32,201,151,0.08) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .hero::after {
+    content: '';
+    position: absolute; top: 0; left: -150px;
+    width: 600px; height: 600px;
+    background: radial-gradient(ellipse, rgba(11,94,215,0.06) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .hero-inner {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;
+    position: relative; z-index: 1;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--teal-light);
+    color: var(--teal-dark);
+    font-family: 'Manrope', sans-serif;
+    font-size: 13px; font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 50px;
+    margin-bottom: 24px;
+  }
+  .hero-badge-dot { width: 8px; height: 8px; background: var(--teal); border-radius: 50%; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.6;transform:scale(1.2)} }
+
+  .hero h1 {
+    font-size: clamp(30px, 4.5vw, 52px);
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 20px;
+  }
+  .hero h1 .highlight {
+    background: var(--grad);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero-sub {
+    font-size: 17px; color: var(--grey-600); margin-bottom: 32px; line-height: 1.7;
+  }
+  .hero-points { display: flex; flex-direction: column; gap: 10px; margin-bottom: 36px; }
+  .hero-point {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 14px; font-weight: 500; color: var(--grey-700);
+  }
+  .hero-point-icon {
+    width: 22px; height: 22px;
+    background: var(--grad);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .hero-point-icon svg { width: 11px; height: 11px; color: white; }
+  .hero-btns { display: flex; gap: 14px; flex-wrap: wrap; }
+
+  /* Hero Visual */
+  .hero-visual { position: relative; }
+  .clinic-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: var(--shadow-lg);
+    padding: 24px;
+    border: 1px solid var(--grey-200);
+  }
+  .clinic-header {
+    display: flex; align-items: center; gap: 14px; margin-bottom: 20px;
+    padding-bottom: 16px; border-bottom: 1px solid var(--grey-100);
+  }
+  .clinic-avatar {
+    width: 48px; height: 48px; border-radius: 14px;
+    background: var(--grad);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .clinic-info h4 { font-size: 14px; font-weight: 700; color: var(--grey-900); }
+  .clinic-info p { font-size: 12px; color: var(--grey-400); }
+  .status-badge {
+    margin-left: auto;
+    background: #dcfce7; color: #16a34a;
+    font-size: 11px; font-weight: 700;
+    padding: 4px 10px; border-radius: 50px;
+  }
+
+  /* WhatsApp Mockup */
+  .wa-mockup {
+    background: #ece5dd;
+    border-radius: 16px;
+    padding: 16px;
+    font-size: 13px;
+  }
+  .wa-header {
+    background: #075e54; color: white;
+    border-radius: 10px 10px 0 0;
+    padding: 10px 14px;
+    display: flex; align-items: center; gap: 10px;
+    margin: -16px -16px 12px;
+    border-radius: 10px 10px 0 0;
+  }
+  .wa-avatar { width: 32px; height: 32px; background: #128c7e; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+  .wa-info .wa-name { font-size: 13px; font-weight: 700; }
+  .wa-info .wa-status { font-size: 11px; opacity: 0.8; }
+  .wa-msgs { display: flex; flex-direction: column; gap: 8px; }
+  .wa-msg {
+    display: inline-block; max-width: 80%;
+    padding: 8px 12px;
+    border-radius: 0 12px 12px 12px;
+    background: white;
+    font-size: 12px; color: #111;
+    position: relative;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  }
+  .wa-msg.sent {
+    align-self: flex-end;
+    background: #dcf8c6;
+    border-radius: 12px 0 12px 12px;
+  }
+  .wa-msg-time { font-size: 10px; color: #999; margin-top: 2px; text-align: right; }
+
+  /* Notification card */
+  .notif-card {
+    position: absolute;
+    top: -20px; right: -20px;
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+    padding: 14px 16px;
+    display: flex; align-items: center; gap: 10px;
+    min-width: 200px;
+    animation: float 4s ease-in-out infinite;
+  }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+  .notif-icon { width: 36px; height: 36px; background: var(--teal-light); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+  .notif-text .notif-title { font-family: 'Manrope',sans-serif; font-size: 12px; font-weight: 700; color: var(--grey-900); }
+  .notif-text .notif-sub { font-size: 11px; color: var(--grey-400); }
+
+  .notif-card-2 {
+    position: absolute;
+    bottom: -15px; left: -15px;
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+    padding: 12px 16px;
+    display: flex; align-items: center; gap: 10px;
+    animation: float 4s ease-in-out infinite 2s;
+  }
+
+  /* PROBLEM SECTION */
+  .section-problem { background: #fafbff; }
+  .problem-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 48px;
+  }
+  .problem-card {
+    background: white;
+    border: 1px solid var(--grey-200);
+    border-radius: var(--radius);
+    padding: 28px;
+    display: flex; gap: 16px;
+    align-items: flex-start;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
+  }
+  .problem-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: rgba(11,94,215,0.2); }
+  .problem-icon {
+    width: 48px; height: 48px; border-radius: 12px;
+    background: #fff3f3;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .problem-card h4 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  .problem-card p { font-size: 14px; color: var(--grey-600); }
+
+  /* AGITATION */
+  .section-agitation {
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+    color: white;
+    position: relative; overflow: hidden;
+  }
+  .section-agitation::before {
+    content: '';
+    position: absolute; top: -200px; right: -100px;
+    width: 500px; height: 500px;
+    background: radial-gradient(ellipse, rgba(32,201,151,0.12) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .section-agitation .section-label { background: rgba(32,201,151,0.15); color: var(--teal); border-color: rgba(32,201,151,0.3); }
+  .section-agitation .section-title { color: white; }
+  .section-agitation .section-sub { color: rgba(255,255,255,0.65); }
+  .agit-points { display: flex; flex-direction: column; gap: 20px; margin-top: 40px; }
+  .agit-point {
+    display: flex; gap: 20px; align-items: flex-start;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: var(--radius);
+    padding: 24px;
+    backdrop-filter: blur(10px);
+  }
+  .agit-num {
+    font-family: 'Manrope', sans-serif;
+    font-size: 28px; font-weight: 900;
+    background: var(--grad);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    flex-shrink: 0; line-height: 1;
+  }
+  .agit-point h4 { font-size: 17px; font-weight: 700; color: white; margin-bottom: 4px; }
+  .agit-point p { font-size: 14px; color: rgba(255,255,255,0.6); }
+
+  /* SOLUTION */
+  .solution-flow {
+    display: flex; align-items: center; justify-content: center;
+    gap: 0; margin-top: 56px; flex-wrap: wrap;
+  }
+  .flow-step {
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+    width: 180px;
+  }
+  .flow-icon {
+    width: 80px; height: 80px;
+    border-radius: 24px;
+    background: var(--grad);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 16px;
+    box-shadow: 0 8px 32px rgba(11,94,215,0.3);
+    transition: transform 0.3s;
+  }
+  .flow-icon:hover { transform: translateY(-6px) scale(1.05); }
+  .flow-icon svg { width: 36px; height: 36px; color: white; }
+  .flow-step h4 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  .flow-step p { font-size: 13px; color: var(--grey-600); line-height: 1.5; }
+  .flow-arrow {
+    font-size: 28px; color: var(--grey-200);
+    padding: 0 8px; margin-bottom: 60px;
+  }
+
+  /* HOW IT WORKS */
+  .section-how { background: var(--grey-50); }
+  .steps-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 48px;
+  }
+  .step-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 28px;
+    border: 1px solid var(--grey-200);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s;
+    box-shadow: var(--shadow-sm);
+  }
+  .step-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--grad);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s;
+  }
+  .step-card:hover::before { transform: scaleX(1); }
+  .step-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+  .step-num {
+    font-family: 'Manrope', sans-serif;
+    font-size: 40px; font-weight: 900;
+    background: var(--grad-soft);
+    -webkit-background-clip: text; -webkit-text-fill-color: var(--blue-light);
+    background-clip: text;
+    color: var(--grey-100);
+    margin-bottom: 12px;
+    line-height: 1;
+  }
+  .step-icon {
+    width: 44px; height: 44px; background: var(--grad-soft);
+    border-radius: 12px; display: flex; align-items: center; justify-content: center;
+    margin-bottom: 16px;
+  }
+  .step-card h4 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+  .step-card p { font-size: 14px; color: var(--grey-600); }
+
+  /* INCLUDED */
+  .included-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 48px;
+  }
+  .included-item {
+    display: flex; align-items: flex-start; gap: 14px;
+    background: white; border: 1px solid var(--grey-200);
+    border-radius: var(--radius-sm);
+    padding: 20px;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s;
+  }
+  .included-item:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: rgba(11,94,215,0.15); }
+  .check-icon {
+    width: 32px; height: 32px; background: var(--teal-light);
+    border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .included-item h4 { font-size: 15px; font-weight: 700; margin-bottom: 2px; }
+  .included-item p { font-size: 13px; color: var(--grey-600); }
+
+  /* PROOF */
+  .section-proof { background: #fafbff; }
+  .case-card {
+    background: white;
+    border-radius: 24px;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--grey-200);
+    overflow: hidden;
+    margin-top: 48px;
+  }
+  .case-header {
+    background: var(--grad);
+    padding: 32px 40px;
+    color: white;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .case-header h3 { font-size: 24px; font-weight: 800; margin-bottom: 4px; }
+  .case-header p { opacity: 0.8; font-size: 14px; }
+  .case-tag {
+    background: rgba(255,255,255,0.2);
+    padding: 6px 16px; border-radius: 50px;
+    font-size: 13px; font-weight: 700;
+  }
+  .case-results {
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    padding: 32px 40px;
+    gap: 24px;
+  }
+  .case-result { text-align: center; }
+  .case-result .val {
+    font-family: 'Manrope', sans-serif;
+    font-size: 32px; font-weight: 900;
+    background: var(--grad);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .case-result .label { font-size: 12px; color: var(--grey-600); font-weight: 500; }
+  .case-highlight {
+    margin: 0 40px 32px;
+    background: var(--grad-soft);
+    border: 1px solid var(--blue-light);
+    border-radius: var(--radius-sm);
+    padding: 20px 24px;
+    font-family: 'Manrope', sans-serif;
+    font-size: 16px; font-weight: 700;
+    color: var(--blue);
+    display: flex; align-items: center; gap: 12px;
+  }
+
+  /* OFFER */
+  .section-offer {
+    background: var(--grad);
+    color: white; text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .section-offer::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+  .section-offer .section-label { background: rgba(255,255,255,0.15); color: white; border-color: rgba(255,255,255,0.3); }
+  .section-offer .section-title { color: white; font-size: clamp(28px,4vw,48px); }
+  .offer-box {
+    background: rgba(255,255,255,0.12);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 20px;
+    padding: 36px 48px;
+    margin: 40px auto 0;
+    max-width: 640px;
+    position: relative; z-index: 1;
+  }
+  .offer-box .big-num {
+    font-family: 'Manrope', sans-serif;
+    font-size: 64px; font-weight: 900;
+    line-height: 1; margin-bottom: 8px;
+  }
+  .offer-box p { font-size: 18px; opacity: 0.85; margin-bottom: 24px; }
+
+  /* GUARANTEE */
+  .guarantee-card {
+    background: white;
+    border-radius: 24px;
+    box-shadow: var(--shadow-lg);
+    padding: 48px;
+    margin-top: 48px;
+    display: flex; align-items: center; gap: 40px;
+    border: 2px solid var(--teal-light);
+  }
+  .guarantee-badge {
+    width: 120px; height: 120px; flex-shrink: 0;
+    background: var(--teal-light);
+    border-radius: 50%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    border: 3px solid var(--teal);
+  }
+  .guarantee-badge .g-pct {
+    font-family: 'Manrope', sans-serif;
+    font-size: 32px; font-weight: 900; color: var(--teal-dark);
+    line-height: 1;
+  }
+  .guarantee-badge .g-back { font-size: 12px; font-weight: 700; color: var(--teal-dark); }
+  .guarantee-text h3 { font-size: 26px; font-weight: 800; margin-bottom: 10px; }
+  .guarantee-text p { font-size: 16px; color: var(--grey-600); line-height: 1.7; }
+
+  /* PRICING */
+  .pricing-card {
+    max-width: 600px; margin: 48px auto 0;
+    background: white;
+    border-radius: 24px;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--grey-200);
+    overflow: hidden;
+    text-align: center;
+  }
+  .pricing-header {
+    background: var(--grad); padding: 32px;
+    color: white;
+  }
+  .pricing-header h3 { font-size: 20px; margin-bottom: 12px; }
+  .pricing-amount {
+    font-family: 'Manrope', sans-serif;
+    font-size: 52px; font-weight: 900; line-height: 1;
+  }
+  .pricing-amount span { font-size: 22px; font-weight: 600; opacity: 0.8; }
+  .pricing-body { padding: 32px; }
+  .pricing-feature {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 0; border-bottom: 1px solid var(--grey-100);
+    text-align: left; font-size: 15px;
+  }
+  .pricing-feature:last-child { border-bottom: none; }
+  .pricing-note {
+    font-size: 13px; color: var(--grey-600);
+    background: var(--grey-50); border-radius: var(--radius-sm);
+    padding: 16px 20px; margin-bottom: 24px; text-align: left;
+  }
+
+  /* WHO */
+  .who-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 48px; }
+  .who-card {
+    background: white; border-radius: var(--radius);
+    padding: 32px; border: 1px solid var(--grey-200);
+    box-shadow: var(--shadow-sm);
+  }
+  .who-card.good { border-top: 4px solid var(--teal); }
+  .who-card.bad { border-top: 4px solid #f87171; }
+  .who-card h3 { font-size: 18px; font-weight: 800; margin-bottom: 20px; }
+  .who-card.good h3 { color: var(--teal-dark); }
+  .who-card.bad h3 { color: #dc2626; }
+  .who-list { display: flex; flex-direction: column; gap: 12px; }
+  .who-item {
+    display: flex; gap: 10px; align-items: flex-start;
+    font-size: 14px; color: var(--grey-700);
+  }
+  .who-item span.dot { flex-shrink: 0; margin-top: 4px; }
+
+  /* FAQ */
+  .section-faq { background: var(--grey-50); }
+  .faq-list { margin-top: 48px; display: flex; flex-direction: column; gap: 12px; max-width: 800px; }
+  .faq-item {
+    background: white; border-radius: var(--radius-sm);
+    border: 1px solid var(--grey-200);
+    overflow: hidden; cursor: pointer;
+    box-shadow: var(--shadow-sm);
+  }
+  .faq-q {
+    padding: 20px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    font-family: 'Manrope', sans-serif;
+    font-weight: 700; font-size: 15px;
+    color: var(--grey-900);
+    user-select: none;
+    transition: background 0.2s;
+  }
+  .faq-item.open .faq-q { background: var(--blue-light); color: var(--blue); }
+  .faq-arrow { transition: transform 0.3s; font-size: 18px; }
+  .faq-item.open .faq-arrow { transform: rotate(45deg); }
+  .faq-a {
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.22,1,0.36,1), padding 0.3s;
+    font-size: 14px; color: var(--grey-600); line-height: 1.7;
+  }
+  .faq-item.open .faq-a { max-height: 300px; padding: 0 24px 20px; }
+
+  /* FINAL CTA */
+  .section-final {
+    background: var(--grey-900);
+    color: white; text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .section-final::before {
+    content: '';
+    position: absolute; top: -50%; left: 50%; transform: translateX(-50%);
+    width: 800px; height: 400px;
+    background: radial-gradient(ellipse, rgba(11,94,215,0.3) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .section-final .section-title { color: white; font-size: clamp(28px, 4vw, 48px); }
+  .final-btns { display: flex; gap: 16px; justify-content: center; margin-top: 32px; flex-wrap: wrap; }
+
+  /* FOOTER */
+  footer {
+    background: var(--grey-900);
+    border-top: 1px solid rgba(255,255,255,0.08);
+    padding: 32px 0;
+    color: rgba(255,255,255,0.4);
+    font-size: 13px;
+  }
+  .footer-inner {
+    max-width: 1100px; margin: 0 auto; padding: 0 24px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .footer-logo { font-family: 'Manrope', sans-serif; font-weight: 900; font-size: 18px; color: white; }
+
+  /* Floating buttons */
+  .floating-cta {
+    position: fixed; bottom: 24px; right: 24px;
+    display: flex; flex-direction: column; align-items: flex-end; gap: 12px;
+    z-index: 99;
+  }
+  .wa-float {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: #25d366; color: white;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 20px rgba(37,211,102,0.5);
+    cursor: pointer;
+    transition: all 0.25s;
+    text-decoration: none;
+  }
+  .wa-float:hover { transform: scale(1.1); box-shadow: 0 8px 32px rgba(37,211,102,0.6); }
+  .book-float {
+    background: var(--grad);
+    color: white;
+    padding: 12px 20px; border-radius: 50px;
+    font-family: 'Manrope', sans-serif;
+    font-size: 13px; font-weight: 700;
+    box-shadow: 0 4px 20px rgba(11,94,215,0.4);
+    cursor: pointer; white-space: nowrap;
+    transition: all 0.25s;
+    text-decoration: none;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .book-float:hover { transform: scale(1.03); box-shadow: 0 8px 32px rgba(11,94,215,0.5); }
+
+  /* Divider */
+  .section-divider {
+    height: 1px; background: var(--grey-200);
+    margin: 0;
+  }
+
+  /* Stats bar */
+  .stats-bar {
+    background: var(--grad-soft);
+    border-top: 1px solid var(--blue-light);
+    border-bottom: 1px solid var(--blue-light);
+    padding: 28px 0;
+  }
+  .stats-inner {
+    display: flex; align-items: center; justify-content: center;
+    gap: 48px; flex-wrap: wrap;
+  }
+  .stat-item { text-align: center; }
+  .stat-val {
+    font-family: 'Manrope', sans-serif;
+    font-size: 32px; font-weight: 900;
+    background: var(--grad);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+  }
+  .stat-label { font-size: 13px; color: var(--grey-600); margin-top: 4px; }
+  .stat-divider { width: 1px; height: 40px; background: var(--grey-200); }
+
+  /* Mobile */
+  @media (max-width: 900px) {
+    .hero-inner { grid-template-columns: 1fr; gap: 40px; }
+    .hero-visual { display: none; }
+    .problem-grid { grid-template-columns: 1fr; }
+    .steps-grid { grid-template-columns: 1fr 1fr; }
+    .case-results { grid-template-columns: repeat(3, 1fr); }
+    .who-grid { grid-template-columns: 1fr; }
+    .included-grid { grid-template-columns: 1fr; }
+    .stats-inner { gap: 24px; }
+    .stat-divider { display: none; }
+    .guarantee-card { flex-direction: column; text-align: center; align-items: center; }
+  }
+  @media (max-width: 640px) {
+    .section { padding: 64px 0; }
+    .steps-grid { grid-template-columns: 1fr; }
+    .case-results { grid-template-columns: repeat(2, 1fr); }
+    .case-header { flex-direction: column; gap: 12px; }
+    .case-highlight { margin: 0 20px 24px; }
+    .case-results { padding: 24px 20px; }
+    .nav-links { display: none; }
+    .hamburger { display: flex; }
+    .flow-arrow { font-size: 18px; }
+    .flow-step { width: 130px; }
+    .pricing-amount { font-size: 40px; }
+    .footer-inner { flex-direction: column; gap: 8px; text-align: center; }
+    .floating-cta { bottom: 16px; right: 16px; }
+    .offer-box { padding: 24px; }
+    .guarantee-card { padding: 28px; }
+    .faq-list { max-width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-inner">
+    <div class="logo">Aero<span>scale</span></div>
+    <div class="nav-links">
+      <a href="#how">How It Works</a>
+      <a href="#proof">Results</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+    </div>
+    <div class="nav-cta">
+      <a href="tel:+917972223919" class="btn btn-primary btn-sm">Book Free Call</a>
+    </div>
+    <div class="hamburger" id="hamburger">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-inner">
+      <div class="hero-left">
+        <div class="hero-badge fade-up">
+          <div class="hero-badge-dot"></div>
+          Only for Healthcare Clinics in Pune
+        </div>
+        <h1 class="fade-up d1">
+          Get <span class="highlight">15–20 Qualified</span> Patient Inquiries Every Month — Or Get 75% Back
+        </h1>
+        <p class="hero-sub fade-up d2">
+          Done-for-you Instagram content + Meta ads system designed exclusively for healthcare clinics in Pune.
+        </p>
+        <div class="hero-points fade-up d3">
+          <div class="hero-point">
+            <div class="hero-point-icon">
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg>
+            </div>
+            We shoot, edit & post all content for you
+          </div>
+          <div class="hero-point">
+            <div class="hero-point-icon">
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg>
+            </div>
+            Local Meta Ads targeted within 10–15 km
+          </div>
+          <div class="hero-point">
+            <div class="hero-point-icon">
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg>
+            </div>
+            Direct inquiries on WhatsApp / DM
+          </div>
+        </div>
+        <div class="hero-btns fade-up d4">
+          <a href="#cta" class="btn btn-primary btn-lg">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 014.52 12 19.79 19.79 0 011.47 3.43 2 2 0 013.44 1.25h3.03a2 2 0 012 1.72c.12.96.36 1.9.72 2.81a2 2 0 01-.45 2.11L7.09 9.22a16 16 0 006.69 6.69l1.34-1.34a2 2 0 012.11-.45c.91.36 1.85.6 2.81.72A2 2 0 0122 16.92z"/></svg>
+            Book a Free Strategy Call
+          </a>
+          <a href="https://wa.me/917721014172?text=GROWTH" class="btn btn-secondary btn-lg" target="_blank">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            DM "GROWTH"
+          </a>
+        </div>
+      </div>
+
+      <div class="hero-visual fade-up d3">
+        <div class="clinic-card" style="position:relative;">
+          <div class="notif-card">
+            <div class="notif-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#20C997" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+            <div class="notif-text">
+              <div class="notif-title">New Inquiry Received!</div>
+              <div class="notif-sub">WhatsApp • Just now</div>
+            </div>
+          </div>
+
+          <div class="clinic-header">
+            <div class="clinic-avatar">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            </div>
+            <div class="clinic-info">
+              <h4>Dr. Priya Sharma Clinic</h4>
+              <p>Skin & Aesthetic Clinic • Pune</p>
+            </div>
+            <div class="status-badge">Active Ads ✓</div>
+          </div>
+
+          <div class="wa-mockup">
+            <div class="wa-header">
+              <div class="wa-avatar">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/></svg>
+              </div>
+              <div class="wa-info">
+                <div class="wa-name">Clinic Inquiries</div>
+                <div class="wa-status">online</div>
+              </div>
+            </div>
+            <div class="wa-msgs">
+              <div class="wa-msg">
+                Hi, I saw your ad. I need a skin consultation. How do I book?
+                <div class="wa-msg-time">10:32 AM</div>
+              </div>
+              <div class="wa-msg sent">
+                Hello! Welcome 😊 Dr. Priya is available Tomorrow 11am or Friday 3pm. Which works for you?
+                <div class="wa-msg-time">10:33 AM ✓✓</div>
+              </div>
+              <div class="wa-msg">
+                Tomorrow 11am works! Please confirm my slot 🙏
+                <div class="wa-msg-time">10:35 AM</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="notif-card-2">
+            <div class="notif-icon" style="background:#dcfce7;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+            </div>
+            <div class="notif-text">
+              <div class="notif-title" style="color:#16a34a;">+7 leads today</div>
+              <div class="notif-sub">Best day this month!</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="container">
+    <div class="stats-inner">
+      <div class="stat-item fade-up">
+        <div class="stat-val">15–20</div>
+        <div class="stat-label">Qualified Leads/Month</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item fade-up d1">
+        <div class="stat-val">10 km</div>
+        <div class="stat-label">Hyperlocal Targeting</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item fade-up d2">
+        <div class="stat-val">30</div>
+        <div class="stat-label">Days to First Results</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item fade-up d3">
+        <div class="stat-val">75%</div>
+        <div class="stat-label">Money-Back Guarantee</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PROBLEM -->
+<section class="section section-problem" id="problem">
+  <div class="container">
+    <div class="fade-up">
+      <div class="section-label">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Sound Familiar?
+      </div>
+      <h2 class="section-title">Good Clinic… But No Consistent Patient Flow?</h2>
+      <p class="section-sub">You've built something great — but the patients just aren't finding you at scale.</p>
+    </div>
+    <div class="problem-grid">
+      <div class="problem-card fade-up d1">
+        <div class="problem-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        </div>
+        <div>
+          <h4>Dependent on Word-of-Mouth</h4>
+          <p>Referrals are unpredictable. Some months are great, others are dead. You can't build a business on hope.</p>
+        </div>
+      </div>
+      <div class="problem-card fade-up d2">
+        <div class="problem-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        </div>
+        <div>
+          <h4>Irregular Instagram Content</h4>
+          <p>Posting once a week, then nothing for 2 weeks. No strategy, no consistency, no growth.</p>
+        </div>
+      </div>
+      <div class="problem-card fade-up d3">
+        <div class="problem-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        </div>
+        <div>
+          <h4>Ads Not Bringing Real Inquiries</h4>
+          <p>Boosting posts with no results. Generic ads that attract the wrong people — or no one at all.</p>
+        </div>
+      </div>
+      <div class="problem-card fade-up d4">
+        <div class="problem-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <div>
+          <h4>Competitors Getting Your Patients</h4>
+          <p>Another clinic opened nearby and they're active online. Patients choose who they see first.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AGITATION -->
+<section class="section section-agitation">
+  <div class="container">
+    <div class="fade-up">
+      <div class="section-label">The Hard Truth</div>
+      <h2 class="section-title" style="color:white;">You're Losing Patients to Competitors Every Day</h2>
+      <p class="section-sub">Every day without a system is revenue walking into a competitor's clinic.</p>
+    </div>
+    <div class="agit-points" style="max-width:700px;">
+      <div class="agit-point fade-up d1">
+        <div class="agit-num">01</div>
+        <div>
+          <h4>Patients Choose Based on Online Presence</h4>
+          <p>91% of patients Google or check Instagram before visiting a clinic. If you're not visible, you don't exist.</p>
+        </div>
+      </div>
+      <div class="agit-point fade-up d2">
+        <div class="agit-num">02</div>
+        <div>
+          <h4>No Predictable Monthly Growth</h4>
+          <p>Without a system, you can't forecast, plan, or scale. Your revenue is unpredictable every single month.</p>
+        </div>
+      </div>
+      <div class="agit-point fade-up d3">
+        <div class="agit-num">03</div>
+        <div>
+          <h4>Wasted Money on Random Marketing</h4>
+          <p>Paying agencies that don't understand healthcare, running irrelevant ads, and getting zero real patients.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOLUTION -->
+<section class="section" id="solution">
+  <div class="container">
+    <div style="text-align:center;" class="fade-up">
+      <div class="section-label" style="display:inline-flex;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 4 12 14.01 9 11.01"/><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/></svg>
+        The Solution
+      </div>
+      <h2 class="section-title">A Predictable System to Bring Patients to You</h2>
+      <p class="section-sub" style="margin:0 auto;">Content builds trust. Ads bring patients. System converts. — This is the Aeroscale framework.</p>
+    </div>
+    <div class="solution-flow">
+      <div class="flow-step fade-up d1">
+        <div class="flow-icon">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        </div>
+        <h4>Content</h4>
+        <p>Reels, tips, testimonials — builds trust & authority</p>
+      </div>
+      <div class="flow-arrow fade-up d1">→</div>
+      <div class="flow-step fade-up d2">
+        <div class="flow-icon">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+        </div>
+        <h4>Meta Ads</h4>
+        <p>Hyperlocal targeting within 10–15 km of your clinic</p>
+      </div>
+      <div class="flow-arrow fade-up d2">→</div>
+      <div class="flow-step fade-up d3">
+        <div class="flow-icon">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        </div>
+        <h4>WhatsApp Funnel</h4>
+        <p>Leads convert directly to bookings on WhatsApp/DM</p>
+      </div>
+      <div class="flow-arrow fade-up d3">→</div>
+      <div class="flow-step fade-up d4">
+        <div class="flow-icon" style="background:linear-gradient(135deg,#16a34a,#15803d);">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        </div>
+        <h4>Patients!</h4>
+        <p>Consistent, qualified patients walking into your clinic</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section section-how" id="how">
+  <div class="container">
+    <div class="fade-up">
+      <div class="section-label">The Process</div>
+      <h2 class="section-title">Simple 30-Day Execution Plan</h2>
+      <p class="section-sub">From onboarding to your first patient inquiries — here's exactly what happens.</p>
+    </div>
+    <div class="steps-grid">
+      <div class="step-card fade-up d1">
+        <div class="step-num">01</div>
+        <div class="step-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0B5ED7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 014.52 12 19.79 19.79 0 011.47 3.43 2 2 0 013.44 1.25h3.03a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L7.09 9.22a16 16 0 006.69 6.69l1.34-1.34a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+        </div>
+        <h4>Onboarding Call</h4>
+        <p>We learn your clinic, your goals, your target patients, and your competitors.</p>
+      </div>
+      <div class="step-card fade-up d2">
+        <div class="step-num">02</div>
+        <div class="step-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0B5ED7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        </div>
+        <h4>One Shoot Day</h4>
+        <p>Our team visits your clinic. We capture all content needed for a full month.</p>
+      </div>
+      <div class="step-card fade-up d3">
+        <div class="step-num">03</div>
+        <div class="step-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0B5ED7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        </div>
+        <h4>Content Calendar Approved</h4>
+        <p>You review and approve the 30-day content plan before anything goes live.</p>
+      </div>
+      <div class="step-card fade-up d1">
+        <div class="step-num">04</div>
+        <div class="step-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0B5ED7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        </div>
+        <h4>Ads Live Within 10 Days</h4>
+        <p>Meta ads targeting patients within 10–15 km of your clinic go live fast.</p>
+      </div>
+      <div class="step-card fade-up d2">
+        <div class="step-num">05</div>
+        <div class="step-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0B5ED7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+        </div>
+        <h4>Weekly Updates</h4>
+        <p>You get weekly performance reports — leads, reach, engagement, and spend.</p>
+      </div>
+      <div class="step-card fade-up d3">
+        <div class="step-num">06</div>
+        <div class="step-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0B5ED7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        </div>
+        <h4>Final Report (Day 30)</h4>
+        <p>Full campaign review — total inquiries, conversions, and plan for next month.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INCLUDED -->
+<section class="section" id="included">
+  <div class="container">
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:24px;" class="fade-up">
+      <div>
+        <div class="section-label">What You Get</div>
+        <h2 class="section-title">Everything Done For You</h2>
+        <p class="section-sub">You focus on treating patients. We handle everything else.</p>
+      </div>
+    </div>
+    <div class="included-grid">
+      <div class="included-item fade-up d1">
+        <div class="check-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#20C997" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div>
+          <h4>10–15 Content Pieces / Month</h4>
+          <p>Consistent, professional content that builds your authority online.</p>
+        </div>
+      </div>
+      <div class="included-item fade-up d2">
+        <div class="check-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#20C997" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div>
+          <h4>Reels, Doctor Tips & Testimonials</h4>
+          <p>Variety of content formats — educational, trust-building, and promotional.</p>
+        </div>
+      </div>
+      <div class="included-item fade-up d1">
+        <div class="check-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#20C997" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div>
+          <h4>Shoot + Editing + Posting</h4>
+          <p>We handle the entire production pipeline — from camera to Instagram.</p>
+        </div>
+      </div>
+      <div class="included-item fade-up d2">
+        <div class="check-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#20C997" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div>
+          <h4>Facebook & Instagram Ads</h4>
+          <p>Full campaign management — creative, targeting, and optimisation.</p>
+        </div>
+      </div>
+      <div class="included-item fade-up d1">
+        <div class="check-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#20C997" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div>
+          <h4>Hyperlocal Targeting (10–15 km)</h4>
+          <p>Ads shown only to people near your clinic — real local patients.</p>
+        </div>
+      </div>
+      <div class="included-item fade-up d2">
+        <div class="check-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#20C997" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div>
+          <h4>Leads Directly on WhatsApp/DM</h4>
+          <p>No middleman — patients message you directly for immediate conversion.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROOF -->
+<section class="section section-proof" id="proof">
+  <div class="container">
+    <div style="text-align:center;" class="fade-up">
+      <div class="section-label" style="display:inline-flex;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Real Results
+      </div>
+      <h2 class="section-title">Proven System That Generates Paying Customers</h2>
+      <p class="section-sub" style="margin:0 auto;">Real campaign results — not estimates, not projections.</p>
+    </div>
+    <div class="case-card fade-up">
+      <div class="case-header">
+        <div>
+          <p style="font-size:13px;opacity:0.7;margin-bottom:4px;">Case Study</p>
+          <h3>Makeup Competition Campaign</h3>
+          <p>High-intent lead generation campaign — Pune</p>
+        </div>
+        <div class="case-tag">Performance Campaign</div>
+      </div>
+      <div class="case-results">
+        <div class="case-result">
+          <div class="val">67</div>
+          <div class="label">High-Quality Leads</div>
+        </div>
+        <div class="case-result">
+          <div class="val">18</div>
+          <div class="label">Paid Conversions</div>
+        </div>
+        <div class="case-result">
+          <div class="val">₹3,100</div>
+          <div class="label">Revenue per Sale</div>
+        </div>
+        <div class="case-result">
+          <div class="val">₹55.8K</div>
+          <div class="label">Total Revenue</div>
+        </div>
+        <div class="case-result">
+          <div class="val">26%</div>
+          <div class="label">Conversion Rate</div>
+        </div>
+      </div>
+      <div class="case-highlight">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0B5ED7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        We don't just generate leads — we convert them into paying customers. Same system applied to healthcare clinics.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OFFER -->
+<section class="section section-offer" id="offer">
+  <div class="container" style="position:relative;z-index:1;text-align:center;">
+    <div class="fade-up">
+      <div class="section-label">Our Promise</div>
+      <h2 class="section-title" style="color:white;">We Don't Do Marketing.<br>We Bring You Patients.</h2>
+    </div>
+    <div class="offer-box fade-up d2">
+      <div class="big-num">15</div>
+      <p>Minimum Qualified Patient Inquiries — Guaranteed in 30 Days</p>
+      <a href="#cta" class="btn btn-outline-white btn-lg">Get Started Today</a>
+    </div>
+  </div>
+</section>
+
+<!-- GUARANTEE -->
+<section class="section">
+  <div class="container">
+    <div class="fade-up">
+      <div class="section-label">Our Guarantee</div>
+      <h2 class="section-title">Your Investment Is Protected</h2>
+    </div>
+    <div class="guarantee-card fade-up">
+      <div class="guarantee-badge">
+        <div class="g-pct">75%</div>
+        <div class="g-back">BACK</div>
+      </div>
+      <div class="guarantee-text">
+        <h3>No Results? Get 75% of Your Money Back.</h3>
+        <p>If we don't deliver at least 15 qualified patient inquiries within your first 30 days, we refund 75% of your agency fee — no arguments, no hoops. That's how confident we are in our system. You carry the clinical expertise, we carry the marketing risk.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="section" id="pricing" style="background:var(--grey-50);">
+  <div class="container">
+    <div style="text-align:center;" class="fade-up">
+      <div class="section-label" style="display:inline-flex;">Simple Pricing</div>
+      <h2 class="section-title">One Monthly Investment. Real Patient Growth.</h2>
+    </div>
+    <div class="pricing-card fade-up d2">
+      <div class="pricing-header">
+        <h3>Full Patient Growth System</h3>
+        <div class="pricing-amount">₹50K–60K<span>/month</span></div>
+        <p style="margin-top:12px;opacity:0.8;font-size:14px;">+ ₹8,000–12,000/month Ad Spend (separate)</p>
+      </div>
+      <div class="pricing-body">
+        <div class="pricing-note">
+          💡 Even 2–3 new patients per month can fully recover your investment. Most clinics see 15+ monthly inquiries.
+        </div>
+        <div class="pricing-feature">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#20C997" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          10–15 content pieces / month
+        </div>
+        <div class="pricing-feature">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#20C997" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Full-service shoot + editing + posting
+        </div>
+        <div class="pricing-feature">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#20C997" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Facebook & Instagram Ad management
+        </div>
+        <div class="pricing-feature">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#20C997" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          WhatsApp/DM lead delivery
+        </div>
+        <div class="pricing-feature">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#20C997" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Weekly performance reports
+        </div>
+        <div class="pricing-feature">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#20C997" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          75% money-back guarantee
+        </div>
+        <a href="#cta" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:24px;">Book Your Free Strategy Call</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHO -->
+<section class="section">
+  <div class="container">
+    <div class="fade-up">
+      <div class="section-label">Is This For You?</div>
+      <h2 class="section-title">Made for the Right Clinics</h2>
+      <p class="section-sub">We only work with clinics we can genuinely help. Here's who that is.</p>
+    </div>
+    <div class="who-grid">
+      <div class="who-card good fade-up d1">
+        <h3>✅ This Is For You If…</h3>
+        <div class="who-list">
+          <div class="who-item"><span class="dot">✓</span> You run a healthcare clinic in Pune</div>
+          <div class="who-item"><span class="dot">✓</span> You have great services but inconsistent patient inquiries</div>
+          <div class="who-item"><span class="dot">✓</span> You want predictable, monthly growth</div>
+          <div class="who-item"><span class="dot">✓</span> You're ready to invest seriously in marketing</div>
+          <div class="who-item"><span class="dot">✓</span> You want to be the #1 clinic in your area</div>
+        </div>
+      </div>
+      <div class="who-card bad fade-up d2">
+        <h3>❌ This Is NOT For You If…</h3>
+        <div class="who-list">
+          <div class="who-item"><span class="dot">✗</span> You're looking for cheap, low-cost marketing</div>
+          <div class="who-item"><span class="dot">✗</span> You're not ready to allocate a real marketing budget</div>
+          <div class="who-item"><span class="dot">✗</span> You expect overnight results without any cooperation</div>
+          <div class="who-item"><span class="dot">✗</span> You're not based in Pune (we're hyperlocal for now)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section section-faq" id="faq">
+  <div class="container">
+    <div class="fade-up">
+      <div class="section-label">FAQ</div>
+      <h2 class="section-title">Common Questions</h2>
+      <p class="section-sub">Everything you need to know before getting started.</p>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item fade-up d1">
+        <div class="faq-q">How fast will I get leads? <span class="faq-arrow">+</span></div>
+        <div class="faq-a">Most clients start seeing inquiries within 7–14 days of ads going live. Our target is 15+ qualified inquiries within your first 30 days.</div>
+      </div>
+      <div class="faq-item fade-up d2">
+        <div class="faq-q">Do I need to do anything for content shoots? <span class="faq-arrow">+</span></div>
+        <div class="faq-a">Very minimal. We visit your clinic for one shoot day per month. You just need to be present (or a team member). We handle scripting, shooting, editing, and posting — everything.</div>
+      </div>
+      <div class="faq-item fade-up d3">
+        <div class="faq-q">How are leads delivered to me? <span class="faq-arrow">+</span></div>
+        <div class="faq-a">Leads land directly in your WhatsApp Business inbox or Instagram DMs — in real time. You talk to the patient directly. No lead management software needed unless you want it.</div>
+      </div>
+      <div class="faq-item fade-up d1">
+        <div class="faq-q">What if I don't get 15 inquiries in 30 days? <span class="faq-arrow">+</span></div>
+        <div class="faq-a">You get 75% of your agency fee refunded. We take the risk so you don't have to. We only win when you win — so we're highly motivated to deliver results.</div>
+      </div>
+      <div class="faq-item fade-up d2">
+        <div class="faq-q">What kind of clinics do you work with? <span class="faq-arrow">+</span></div>
+        <div class="faq-a">Doctors, dentists, skin clinics, fertility clinics, physiotherapy centres, and other healthcare practices in Pune. We specialise exclusively in healthcare — no other industries.</div>
+      </div>
+      <div class="faq-item fade-up d3">
+        <div class="faq-q">Is the ad spend included in the package? <span class="faq-arrow">+</span></div>
+        <div class="faq-a">No — the ad budget of ₹8,000–₹12,000/month is separate and goes directly to Meta (Facebook/Instagram). Our fee covers management, strategy, content, and execution. This way you have full transparency on where every rupee goes.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="section section-final" id="cta">
+  <div class="container" style="position:relative;z-index:1;text-align:center;">
+    <div class="fade-up">
+      <div class="section-label" style="display:inline-flex;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.8);border-color:rgba(255,255,255,0.2);">
+        Limited Spots Available
+      </div>
+      <h2 class="section-title" style="color:white;max-width:700px;margin:0 auto 20px;">Ready to Get Consistent Patient Inquiries Every Month?</h2>
+      <p style="color:rgba(255,255,255,0.65);font-size:17px;margin-bottom:40px;max-width:520px;margin-left:auto;margin-right:auto;">We only work with 5 clinics at a time to ensure quality. Book your free strategy call before the spots fill up.</p>
+    </div>
+    <div class="final-btns fade-up d2">
+      <a href="tel:+917972223919" class="btn btn-primary btn-lg" style="background:white;color:var(--blue);box-shadow:0 4px 20px rgba(255,255,255,0.3);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 014.52 12 19.79 19.79 0 011.47 3.43 2 2 0 013.44 1.25h3.03a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L7.09 9.22a16 16 0 006.69 6.69l1.34-1.34a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+        Book Free Strategy Call
+      </a>
+      <a href="https://wa.me/917721014172?text=AEROSCALE" class="btn btn-outline-white btn-lg" target="_blank">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        DM "AEROSCALE"
+      </a>
+    </div>
+    <p style="margin-top:24px;color:rgba(255,255,255,0.4);font-size:13px;" class="fade-up d3">No commitment. Just a 20-minute call to see if we're the right fit.</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">Aeroscale</div>
+    <div>Healthcare Marketing Agency • Pune, India</div>
+    <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
+      <a href="tel:+917972223919" style="color:rgba(255,255,255,0.5);font-size:13px;">📞 +91 79722 23919</a>
+      <a href="tel:+918625846484" style="color:rgba(255,255,255,0.5);font-size:13px;">📞 +91 86258 46484</a>
+      <a href="https://wa.me/917721014172" style="color:rgba(255,255,255,0.5);font-size:13px;" target="_blank">💬 WhatsApp</a>
+    </div>
+  </div>
+</footer>
+
+<!-- STETHOSCOPE MAGIC POPUP -->
+<div id="stetho-overlay" style="display:none;">
+  <div id="stetho-backdrop"></div>
+  <div id="stetho-popup">
+    <div id="stetho-sparkles"></div>
+    <div id="stetho-rings">
+      <div class="sring r1"></div>
+      <div class="sring r2"></div>
+      <div class="sring r3"></div>
+    </div>
+    <div id="stetho-icon">
+      <svg id="stetho-svg" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Earpieces -->
+        <circle cx="34" cy="22" r="6" fill="url(#sg)" stroke="white" stroke-width="1.5"/>
+        <circle cx="86" cy="22" r="6" fill="url(#sg)" stroke="white" stroke-width="1.5"/>
+        <!-- Ear tubes -->
+        <path d="M34 28 Q34 44 60 44 Q86 44 86 28" stroke="white" stroke-width="4" stroke-linecap="round" fill="none"/>
+        <!-- Main tube down -->
+        <path d="M60 44 L60 74" stroke="white" stroke-width="4" stroke-linecap="round"/>
+        <!-- Curve to chest piece -->
+        <path d="M60 74 Q60 90 76 90 Q92 90 92 76 Q92 62 76 62 Q62 62 60 74" stroke="white" stroke-width="4" stroke-linecap="round" fill="none"/>
+        <!-- Chest piece (diaphragm) -->
+        <circle cx="76" cy="90" r="16" fill="url(#sg2)" stroke="white" stroke-width="2.5"/>
+        <circle cx="76" cy="90" r="9" fill="rgba(255,255,255,0.25)" stroke="white" stroke-width="1.5"/>
+        <circle cx="76" cy="90" r="3.5" fill="white"/>
+        <!-- Heartbeat line inside chest piece -->
+        <defs>
+          <linearGradient id="sg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#0B5ED7"/>
+            <stop offset="100%" stop-color="#20C997"/>
+          </linearGradient>
+          <linearGradient id="sg2" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#0B5ED7"/>
+            <stop offset="100%" stop-color="#20C997"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+    <div id="stetho-pulse-ring"></div>
+    <div id="stetho-content">
+      <h3 id="stetho-title">We're Ready for You!</h3>
+      <p id="stetho-sub">Choose how you'd like to connect with us:</p>
+      <div id="stetho-actions">
+        <a id="stetho-call-btn" href="tel:+917972223919" class="stetho-action-btn primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 014.52 12 19.79 19.79 0 011.47 3.43 2 2 0 013.44 1.25h3.03a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L7.09 9.22a16 16 0 006.69 6.69l1.34-1.34a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+          Call +91 79722 23919
+        </a>
+        <a id="stetho-wa-btn" href="https://wa.me/917721014172?text=GROWTH" target="_blank" class="stetho-action-btn wa">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z M12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413A11.815 11.815 0 0012.05 0z"/></svg>
+          WhatsApp Us
+        </a>
+      </div>
+      <button id="stetho-close">Maybe later</button>
+    </div>
+  </div>
+</div>
+
+<style>
+#stetho-overlay {
+  position: fixed; inset: 0; z-index: 9999;
+  align-items: center; justify-content: center;
+}
+#stetho-overlay.active { display: flex !important; }
+
+#stetho-backdrop {
+  position: absolute; inset: 0;
+  background: rgba(10, 20, 50, 0.72);
+  backdrop-filter: blur(8px);
+  animation: backdropIn 0.4s ease forwards;
+}
+@keyframes backdropIn { from{opacity:0} to{opacity:1} }
+
+#stetho-popup {
+  position: relative; z-index: 1;
+  background: white;
+  border-radius: 28px;
+  padding: 48px 40px 36px;
+  text-align: center;
+  max-width: 420px; width: 90%;
+  box-shadow: 0 32px 80px rgba(11,94,215,0.3), 0 0 0 1px rgba(11,94,215,0.1);
+  animation: popupMagic 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards;
+  overflow: hidden;
+}
+@keyframes popupMagic {
+  0%  { opacity:0; transform: scale(0.3) rotate(-8deg); }
+  60% { opacity:1; transform: scale(1.05) rotate(1deg); }
+  100%{ opacity:1; transform: scale(1) rotate(0deg); }
+}
+
+/* Rings */
+#stetho-rings { position:absolute; inset:0; pointer-events:none; }
+.sring {
+  position: absolute; border-radius: 50%;
+  border: 2px solid rgba(11,94,215,0.15);
+  top: 50%; left: 50%; transform: translate(-50%,-50%) scale(0);
+  animation: ringExpand 1.8s ease-out infinite;
+}
+.sring.r1 { width: 180px; height: 180px; animation-delay: 0s; }
+.sring.r2 { width: 260px; height: 260px; animation-delay: 0.3s; }
+.sring.r3 { width: 360px; height: 360px; animation-delay: 0.6s; }
+@keyframes ringExpand {
+  0%  { transform: translate(-50%,-50%) scale(0); opacity: 0.8; }
+  100%{ transform: translate(-50%,-50%) scale(1); opacity: 0; }
+}
+
+/* Stethoscope icon */
+#stetho-icon {
+  width: 110px; height: 110px;
+  background: linear-gradient(135deg, #0B5ED7, #20C997);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 8px;
+  box-shadow: 0 12px 40px rgba(11,94,215,0.4);
+  animation: stethoFloat 3s ease-in-out infinite 0.6s, stethoSpin 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards;
+  position: relative; z-index: 2;
+}
+@keyframes stethoFloat {
+  0%,100%{ transform: translateY(0) rotate(0deg); }
+  50%    { transform: translateY(-10px) rotate(3deg); }
+}
+@keyframes stethoSpin {
+  0%  { transform: scale(0) rotate(-180deg); }
+  100%{ transform: scale(1) rotate(0deg); }
+}
+#stetho-svg { width: 70px; height: 70px; }
+
+/* Pulse ring around icon */
+#stetho-pulse-ring {
+  width: 130px; height: 130px;
+  border-radius: 50%;
+  border: 3px solid rgba(32,201,151,0.5);
+  position: absolute;
+  top: 48px; left: 50%; transform: translateX(-50%);
+  animation: pulseRing 1.5s ease-out infinite 0.8s;
+  pointer-events: none;
+}
+@keyframes pulseRing {
+  0%  { transform: translateX(-50%) scale(1); opacity: 1; }
+  100%{ transform: translateX(-50%) scale(1.6); opacity: 0; }
+}
+
+/* Sparkles */
+.sparkle {
+  position: absolute;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: sparklePop 0.8s ease-out forwards;
+}
+@keyframes sparklePop {
+  0%  { transform: scale(0) translate(0,0); opacity: 1; }
+  100%{ transform: scale(1) translate(var(--sx), var(--sy)); opacity: 0; }
+}
+
+/* Content */
+#stetho-content { position: relative; z-index: 2; margin-top: 16px; }
+#stetho-title {
+  font-family: 'Manrope', sans-serif;
+  font-size: 24px; font-weight: 900;
+  color: #0f172a; margin-bottom: 8px;
+  animation: fadeSlideUp 0.5s 0.4s both;
+}
+#stetho-sub {
+  font-size: 14px; color: #64748b; margin-bottom: 24px;
+  animation: fadeSlideUp 0.5s 0.5s both;
+}
+@keyframes fadeSlideUp {
+  from{ opacity:0; transform: translateY(12px); }
+  to  { opacity:1; transform: translateY(0); }
+}
+
+#stetho-actions {
+  display: flex; flex-direction: column; gap: 12px;
+  animation: fadeSlideUp 0.5s 0.6s both;
+}
+.stetho-action-btn {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 15px 24px; border-radius: 50px;
+  font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 15px;
+  cursor: pointer; text-decoration: none;
+  transition: all 0.25s cubic-bezier(0.22,1,0.36,1);
+}
+.stetho-action-btn:hover { transform: scale(1.03); }
+.stetho-action-btn:active { transform: scale(0.97); }
+.stetho-action-btn.primary {
+  background: linear-gradient(135deg, #0B5ED7, #20C997);
+  color: white;
+  box-shadow: 0 6px 24px rgba(11,94,215,0.35);
+}
+.stetho-action-btn.primary:hover { box-shadow: 0 10px 32px rgba(11,94,215,0.5); }
+.stetho-action-btn.wa {
+  background: #25d366; color: white;
+  box-shadow: 0 6px 24px rgba(37,211,102,0.35);
+}
+.stetho-action-btn.wa:hover { box-shadow: 0 10px 32px rgba(37,211,102,0.5); }
+
+#stetho-close {
+  margin-top: 16px; background: none; border: none;
+  color: #94a3b8; font-size: 13px; cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: color 0.2s;
+  animation: fadeSlideUp 0.5s 0.7s both;
+}
+#stetho-close:hover { color: #475569; }
+</style>
+
+<!-- FLOATING BUTTONS -->
+<div class="floating-cta">
+  <a href="tel:+917972223919" class="book-float">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 014.52 12 19.79 19.79 0 011.47 3.43 2 2 0 013.44 1.25h3.03a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L7.09 9.22a16 16 0 006.69 6.69l1.34-1.34a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+    Book Free Call
+  </a>
+  <a href="https://wa.me/917721014172?text=GROWTH" class="wa-float" target="_blank">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+  </a>
+</div>
+
+<script>
+// Scroll animations
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(el => {
+    if (el.isIntersecting) {
+      el.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.12 });
+
+document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+// Nav scroll effect
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 20);
+});
+
+// FAQ accordion
+document.querySelectorAll('.faq-item').forEach(item => {
+  item.querySelector('.faq-q').addEventListener('click', () => {
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+    if (!isOpen) item.classList.add('open');
+  });
+});
+
+// Hamburger (mobile)
+document.getElementById('hamburger').addEventListener('click', () => {
+  const links = document.querySelector('.nav-links');
+  links.style.display = links.style.display === 'flex' ? 'none' : 'flex';
+  links.style.flexDirection = 'column';
+  links.style.position = 'absolute';
+  links.style.top = '68px';
+  links.style.left = '0';
+  links.style.right = '0';
+  links.style.background = 'white';
+  links.style.padding = '20px 24px';
+  links.style.borderTop = '1px solid #e2e8f0';
+  links.style.gap = '20px';
+  links.style.boxShadow = '0 8px 24px rgba(0,0,0,0.08)';
+  links.style.zIndex = '99';
+});
+
+// Stethoscope Magic Popup
+const overlay = document.getElementById('stetho-overlay');
+const popup   = document.getElementById('stetho-popup');
+const sparklesEl = document.getElementById('stetho-sparkles');
+
+const sparkColors = ['#0B5ED7','#20C997','#60a5fa','#34d399','#a78bfa','#facc15'];
+
+function launchSparkles() {
+  sparklesEl.innerHTML = '';
+  for (let i = 0; i < 18; i++) {
+    const s = document.createElement('div');
+    s.className = 'sparkle';
+    const angle = (i / 18) * 360;
+    const dist  = 60 + Math.random() * 80;
+    const sx = Math.cos(angle * Math.PI/180) * dist + 'px';
+    const sy = Math.sin(angle * Math.PI/180) * dist + 'px';
+    s.style.cssText = `
+      left: calc(50% - 4px);
+      top: calc(50% - 4px);
+      background: ${sparkColors[i % sparkColors.length]};
+      --sx: ${sx}; --sy: ${sy};
+      animation-delay: ${Math.random()*0.2}s;
+      width: ${4 + Math.random()*8}px;
+      height: ${4 + Math.random()*8}px;
+    `;
+    sparklesEl.appendChild(s);
+  }
+}
+
+function openStetho(mode) {
+  // Set message based on button type
+  const title = document.getElementById('stetho-title');
+  const sub   = document.getElementById('stetho-sub');
+  if (mode === 'dm') {
+    title.textContent = 'Let\'s Talk Growth! 🌱';
+    sub.textContent   = 'DM us "GROWTH" or call — we\'ll get back within minutes.';
+    document.getElementById('stetho-wa-btn').href = 'https://wa.me/917721014172?text=GROWTH';
+  } else {
+    title.textContent = 'Book Your Free Strategy Call!';
+    sub.textContent   = 'Pick what works best for you — call or WhatsApp:';
+    document.getElementById('stetho-wa-btn').href = 'https://wa.me/917721014172?text=AEROSCALE';
+  }
+
+  // Reset animation by cloning popup
+  popup.style.animation = 'none';
+  popup.offsetHeight; // reflow
+  popup.style.animation = '';
+
+  overlay.style.display = 'flex';
+  requestAnimationFrame(() => overlay.classList.add('active'));
+  launchSparkles();
+}
+
+function closeStetho() {
+  overlay.classList.remove('active');
+  setTimeout(() => { overlay.style.display = 'none'; }, 300);
+}
+
+document.getElementById('stetho-backdrop').addEventListener('click', closeStetho);
+document.getElementById('stetho-close').addEventListener('click', closeStetho);
+
+// Hook all CTA buttons
+document.querySelectorAll('a[href*="Book"], a.btn-primary, a.btn-secondary, .book-float').forEach(btn => {
+  const text = btn.textContent.trim().toLowerCase();
+  const href = btn.getAttribute('href') || '';
+
+  // Only intercept "Book" and "DM" buttons (not the wa-float itself)
+  if (
+    text.includes('book') ||
+    text.includes('strategy') ||
+    text.includes('dm') ||
+    text.includes('growth') ||
+    text.includes('aeroscale')
+  ) {
+    btn.addEventListener('click', function(e) {
+      // Don't intercept if it's a direct tel: or wa.me link in the popup itself
+      if (btn.closest('#stetho-popup')) return;
+      e.preventDefault();
+      const isDm = text.includes('dm') || text.includes('growth') || text.includes('aeroscale');
+      openStetho(isDm ? 'dm' : 'call');
+    });
+  }
+});
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const id = a.getAttribute('href');
+    const el = document.querySelector(id);
+    if (el) {
+      e.preventDefault();
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+});
+</script>
+</body>
+</html>
